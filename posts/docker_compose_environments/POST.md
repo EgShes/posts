@@ -9,7 +9,7 @@ Docker Compose is a great instrument, and it natively enables it in different wa
 But generally we need to define common and environment specific configurations and tell Compose
 how to merge them.
 
-### Extending using [multiple Compose files](https://docs.docker.com/compose/extends/#multiple-compose-files)
+## Extending using [multiple Compose files](https://docs.docker.com/compose/extends/#multiple-compose-files)
 
 With this method we just define environment specific variables with the same service name across
 different configs.
@@ -78,4 +78,93 @@ services:
       target: 5432
 version: '3.9'
 ```
+
+## Extending using [the _extends_ field](https://docs.docker.com/compose/extends/#extending-services)
+
+With this method we explicitly define services we extend from. It'll be a base config with some common  
+things.
+
+It's worth noting that this method is deprecated and work only for Compose file versions up to 2.1.  
+
+This is our common config `common-services.yml`
+```bash
+version: "2.1"
+
+services:
+
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_PASSWORD
+
+  app:
+    image: python:3.9
+    depends_on:
+      - db
+    ports:
+      - 8080:8080
+```
+
+And this is the environment specific config `docker-compose.dev.yml`
+```bash
+services:
+
+  db:
+    extends:
+      file: common-services.yml
+      service: db
+    ports:
+      - 5432:5432
+
+  app:
+    extends:
+      file: common-services.yml
+      service: db
+    environment:
+      - DEBUG=true
+
+  adminer:
+    image: adminer
+```
+
+The merged services are the following:
+```bash
+$ docker-compose -f docker-compose.dev.yml config
+
+services:
+  adminer:
+    image: adminer
+  app:
+    environment:
+      DEBUG: "true"
+      POSTGRES_PASSWORD: null
+    image: postgres
+  db:
+    environment:
+      POSTGRES_PASSWORD: null
+    image: postgres
+    ports:
+    - published: 5432
+      target: 5432
+version: '3.9'
+
+egor@egor-Aspire-E5-575G:~/projects/posts/posts/docker_compose_environments/docker_extends$ docker-compose -f docker-compose.dev.yml config
+services:
+  adminer:
+    image: adminer
+  app:
+    environment:
+      DEBUG: "true"
+      POSTGRES_PASSWORD: null
+    image: postgres
+  db:
+    environment:
+      POSTGRES_PASSWORD: null
+    image: postgres
+    ports:
+    - published: 5432
+      target: 5432
+version: '3.9'
+```
+
 

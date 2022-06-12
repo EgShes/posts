@@ -1,0 +1,18 @@
+services:
+
+  db:
+    extends:
+      file: common-services.yml
+      service: db
+    ports:
+      - 5432:5432
+
+  app:
+    extends:
+      file: common-services.yml
+      service: db
+    environment:
+      - DEBUG=true
+
+  adminer:
+    image: adminer

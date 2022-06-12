@@ -1,0 +1,13 @@
+services:
+
+  db:
+    extends:
+      file: common-services.yml
+      service: db
+    environment:
+      - POSTGRES_PASSWORD_FILE=/some_path
+
+  app:
+    extends:
+      file: common-services.yml
+      service: app
