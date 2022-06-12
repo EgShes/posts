@@ -1,0 +1,12 @@
+services:
+
+  db:
+    ports:
+      - 5432:5432
+
+  app:
+    environment:
+      - DEBUG=true
+
+  adminer:
+    image: adminer
