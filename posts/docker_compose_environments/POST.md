@@ -1,17 +1,17 @@
-In this post I'll share three methods how to enable different environments in Docker Compose and which of then I prefer most.
+In this blog post I'll show two methods how to enable different environments in Docker Compose and which of then I prefer most.
 
-I use Docker Compose when I need to run multi-container Docker application.
+I use Docker Compose when I need to run a multi-container Docker application.
 Often I need to have different setups for different environments. 
 For example, I want to set `debug` variable to `false` for a production environment and have an 
 additional service for database administration for a development. 
 
-Docker Compose is a great instrument, and it natively enables it in different ways.
-But generally we need to define common and environment specific configurations and tell Compose
+Docker Compose is a great tool, and it natively enables this in different ways.
+But usually we need to define common and environment-specific configurations and tell Compose
 how to merge them.
 
 ## Extending using [multiple Compose files](https://docs.docker.com/compose/extends/#multiple-compose-files)
 
-With this method we just define environment specific variables with the same service name across
+With this method we just define environment-specific variables with the same service name across
 different configs.
 
 > If a service is defined in both files, Compose merges the configurations using the rules described in Adding and overriding configuration.
@@ -51,7 +51,7 @@ services:
     image: adminer
 ```
 
-The merged services are the following:
+The merged services are as follows:
 
 ```bash
 $ docker-compose -f docker-compose.yml -f docker-compose.dev.yml config
@@ -81,7 +81,9 @@ version: '3.9'
 
 ## Extending using [the _extends_ field](https://docs.docker.com/compose/extends/#extending-services)
 
-With this method we explicitly define services we extend from. It'll be a base config with some common  
+> Docker Compose’s extends keyword enables the sharing of common configurations among different files, or even different projects entirely. 
+
+With this method, we explicitly define services we extend from. There'll be a base config with some common  
 things.
 
 It's worth noting that this method is deprecated and work only for Compose file versions up to 2.1.  
@@ -105,7 +107,7 @@ services:
       - 8080:8080
 ```
 
-And this is the environment specific config `docker-compose.dev.yml`
+And this is the environment-specific config `docker-compose.dev.yml`
 ```bash
 services:
 
@@ -127,7 +129,7 @@ services:
     image: adminer
 ```
 
-The merged services are the following:
+The merged services are as follows:
 ```bash
 $ docker-compose -f docker-compose.dev.yml config
 
@@ -167,4 +169,12 @@ services:
 version: '3.9'
 ```
 
+## Conclusion
 
+Personally, I prefer the first method because:
+
+- It is more transparent for you as to what parts your final config is constructed of as you define all
+files in a command;
+- It is not deprecated
+
+But of course it requires more typing for a command :(
